@@ -1,5 +1,7 @@
+import 'package:flutter/material.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:path/path.dart';
+import 'dart:io';
 
 class User {
   int? id;
@@ -27,28 +29,44 @@ class DatabaseHelper {
     if (_database != null) return _database!;
     sqfliteFfiInit(); // Initialize for desktop
     databaseFactory = databaseFactoryFfi;
-    _database = await _initDB('users.db');
+    _database = await _initDB();
     return _database!;
   }
+  Future<Database> _initDB() async {
+    try {
+      final dbPath = await getDatabasesPath(); // This gives a path to a writable directory.
+      final path = join(dbPath, 'users.db');
 
-  Future<Database> _initDB(String filePath) async {
-    final dbPath = await getDatabasesPath();
-    final path = join(dbPath, filePath);
-
-    return await databaseFactory.openDatabase(path,
-        options: OpenDatabaseOptions(
-          version: 1,
-          onCreate: (db, version) async {
-            await db.execute('''
-              CREATE TABLE users (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT NOT NULL,
-                age INTEGER NOT NULL
-              )
+      return await databaseFactory.openDatabase(path,
+          options: OpenDatabaseOptions(
+            version: 1,
+            onCreate: (db, version) async {
+              await db.execute(''' 
+            CREATE TABLE users (
+              id INTEGER PRIMARY KEY AUTOINCREMENT,
+              name TEXT NOT NULL,
+              age INTEGER NOT NULL
+            )
             ''');
-          },
-        ));
+
+              // Insert 5 initial users
+              for (int i = 1; i <= 5; i++) {
+                await db.insert('users', {
+                  'name': 'User $i',
+                  'age': 20 + i,
+                });
+              }
+
+            },
+          ));
+    } catch (e) {
+
+      print("Database error: $e");
+      rethrow;
+    }
   }
+
+
 
   Future<int> addUser(User user) async {
     final db = await database;

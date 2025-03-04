@@ -1,10 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'db.dart';
+Future<void> _insertInitialUsers() async {
+  final db = await DatabaseHelper.instance.database;
 
-void main() {
+  // Insert 5 users again (even if the database exists)
+  for (int i = 1; i <= 5; i++) {
+    await db.insert('users', {
+      'name': 'User $i',
+      'age': 20 + i,
+    });
+  }
+}
+
+void main() async{
+  WidgetsFlutterBinding.ensureInitialized();
+  await DatabaseHelper.instance.database; // Ensures database is initialized
+  await _insertInitialUsers(); // Insert 5 users at app launch
+  // Ensure FFI is initialized before database access
   sqfliteFfiInit();
   databaseFactory = databaseFactoryFfi;
+
   runApp(MyApp());
 }
 
@@ -13,9 +29,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Desktop CRUD Example',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
+      theme: ThemeData(primarySwatch: Colors.blue),
       home: UserListPage(),
     );
   }
@@ -41,7 +55,6 @@ class _UserListPageState extends State<UserListPage> {
     });
   }
 
-  // Add new user
   void _addUser() {
     showDialog(
       context: context,
@@ -57,13 +70,11 @@ class _UserListPageState extends State<UserListPage> {
     );
   }
 
-  // Delete user
   void _deleteUser(int id) async {
     await DatabaseHelper.instance.deleteUser(id);
     _refreshUsers();
   }
 
-  // Update user
   void _updateUser(User user) {
     showDialog(
       context: context,
@@ -90,10 +101,9 @@ class _UserListPageState extends State<UserListPage> {
         title: Text("Users CRUD"),
         actions: [
           IconButton(
-            icon: Icon(Icons.add,color: Colors.red,size: 50,),
+            icon: Icon(Icons.add, color: Colors.white),
             onPressed: _addUser,
           ),
-          SizedBox(width: 100,)
         ],
       ),
       body: FutureBuilder<List<User>>(

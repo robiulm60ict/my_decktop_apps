@@ -1,4 +1,4 @@
-!define APP_NAME "MyDesktopApp"
+!define APP_NAME "MyApp"
 !define EXE_NAME "App.exe"
 !define INSTALL_DIR "$PROGRAMFILES64\${APP_NAME}"
 
