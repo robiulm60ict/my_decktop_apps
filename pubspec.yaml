@@ -35,10 +35,15 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
   sqlite3: ^2.7.4
-  sqflite_common_ffi: ^2.0.0+3
-  sqflite: ^2.0.0+3  # or the latest version
+  sqlite3_flutter_libs: ^0.5.7
   path_provider: ^2.0.9
   path: ^1.8.0
+
+#  sqlite3: ^2.7.4
+#  sqflite_common_ffi: ^2.0.0+3
+#  sqflite: ^2.0.0+3  # or the latest version
+#  path_provider: ^2.0.9
+#  path: ^1.8.0
 
 
 
